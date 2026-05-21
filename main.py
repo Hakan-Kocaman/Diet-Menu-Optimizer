@@ -8,7 +8,7 @@ from pymoo.indicators.hv import HV
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.moo.spea2 import SPEA2
 
-from db import get_foods, get_nutrients, get_dri, get_user_preferences
+from db import foods_list, nutrients_list, get_dri, get_user_preferences
 from chromosome import decode
 from fitness import fitness
 
@@ -16,8 +16,8 @@ from fitness import fitness
 class DietProblem(Problem):
     def __init__(self, user_id):
         super().__init__(n_var=405, n_obj=3, xl=0, xu=405)
-        self.foods = get_foods()
-        self.nutrients = get_nutrients()
+        self.foods = foods_list
+        self.nutrients = nutrients_list
         self.dri = get_dri(user_id)
         self.preferences = get_user_preferences(user_id)
 
@@ -25,8 +25,9 @@ class DietProblem(Problem):
         objectives = []
         for x in X:
             menu, totals = decode(x, self.foods, self.nutrients, self.dri)
-            preference, cost, prepTime, penalty = fitness(menu, totals, self.foods, self.preferences, self.dri)
-            objectives.append([-preference, cost, prepTime])
+            values, info = fitness(menu, totals, self.foods, self.preferences, self.dri)
+            objectives.append(values)
+
         out["F"] = np.array(objectives)
 
 

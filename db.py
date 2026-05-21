@@ -20,8 +20,11 @@ def get_foods():
 def get_nutrients():
     pass
 
-def get_dri():
+def get_dri(user_id):
     pass
 
-def get_user_preferences():
+def get_user_preferences(user_id):
     pass
+
+food_list = get_foods()
+nutrient_list = get_nutrients()
