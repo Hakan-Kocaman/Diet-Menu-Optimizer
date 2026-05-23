@@ -51,7 +51,7 @@ result_u2_s = minimize(problem_u2, SPEA2(pop_size=100), ('n_gen', 200), verbose=
 print("SPEA2 bitti:", len(result_u2_s.F), "çözüm")
 
 # ── KARŞILAŞTIRMA - REFERANS NOKTASI ──────────────────────────────────
-all_F = np.vstack([result_u1_n.F, result_u1_s.F, result_u2_n.F])
+all_F = np.vstack([result_u1_n.F, result_u1_s.F, result_u2_n.F, result_u2_s.F])
 ref_point = np.max(all_F, axis=0) * 1.1
 
 # ── KARŞILAŞTIRMA - HYPERVOLUME ─────────────────────────────────────

@@ -8,11 +8,18 @@ def get_connection():
         database="diet_menu_optimizer"
     )
 
-conn = get_connection()
-if conn.is_connected():
-    print("Veritabanına bağlanıldı.")
-else:
-    print("Veritabanına bağlanılamadı.")
+def test_connection():
+    try:
+        conn = get_connection()
+        if conn.is_connected():
+            print("Connected to the database.")
+            conn.close()
+        else:
+            print("Failed to connect to the database.")
+    except mysql.connector.Error as err:
+        print(f"Database connection error: {err}")
+
+test_connection()
 
 def get_foods():
     conn = get_connection()
