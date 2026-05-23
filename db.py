@@ -17,59 +17,71 @@ else:
 def get_foods():
     conn = get_connection()
     cursor = conn.cursor()
-    query= "SELECT food_id, name, cost, preparingTime, cookingTime, preference FROM foods"
+    query = "SELECT id, name, cost, preparingTime, cookingTime, preference, co2 FROM foods"
     cursor.execute(query)
     foods = cursor.fetchall()
     cursor.close()
     conn.close()
-    return {row[0]: {"name": row[1], "cost": row[2], "preparingTime": row[3],"cookingTime": row[4], "preference": row[5]} for row in foods}  
+    return {row[0]: {"name": row[1], "cost": row[2], "preparingTime": row[3],
+                     "cookingTime": row[4], "preference": row[5], "co2": row[6]} for row in foods}
 
 def get_nutrients():
     conn = get_connection()
     cursor = conn.cursor()
-    query = "SELECT nutrient_id, name, unit FROM nutrients"
+    query = "SELECT id, name FROM nutrients"
     cursor.execute(query)
     nutrients = cursor.fetchall()
     cursor.close()
     conn.close()
-    return {row[0]: {"name": row[1], "unit": row[2]} for row in nutrients}
+    return {row[0]: {"name": row[1]} for row in nutrients}
 
 def get_food_nutrients():
     conn = get_connection()
     cursor = conn.cursor()
-
-    query = "SELECT food_id, nutrient_id, amount FROM food_nutrients"
+    query = "SELECT foodId, nutrientId, quantity FROM food_nutrients"
     cursor.execute(query)
     food_nutrients = cursor.fetchall()
     result = {}
-    for food_id, nutrient_id, amount in food_nutrients:
+    for food_id, nutrient_id, quantity in food_nutrients:
         if food_id not in result:
             result[food_id] = {}
-        result[food_id][nutrient_id] = amount
+        result[food_id][nutrient_id] = quantity
     cursor.close()
     conn.close()
     return result
 
 def get_dri(user_id):
+    # dri tablosunda user_id yok, yaş ve cinsiyete göre filtreleniyor
     conn = get_connection()
     cursor = conn.cursor()
-    query = "SELECT nutrient_id, RLL, RUL, name FROM dri WHERE user_id = %s"
-    cursor.execute(query, (user_id,))
+    # Önce kullanıcı bilgilerini al
+    cursor.execute("SELECT age, gender FROM user WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    if not user:
+        cursor.close()
+        conn.close()
+        return {}
+    age, gender = user
+    query = """
+        SELECT nutrient_id, RLL, RUL 
+        FROM dri 
+        WHERE low_age <= %s AND up_age >= %s AND gender = %s
+    """
+    cursor.execute(query, (age, age, gender))
     dri = cursor.fetchall()
     cursor.close()
     conn.close()
-    return {row[0]: {"RLL": row[1], "RUL": row[2], "name": row[3]} for row in dri}
+    return {row[0]: {"RLL": row[1], "RUL": row[2]} for row in dri}
 
 def get_user_preferences(user_id):
     conn = get_connection()
     cursor = conn.cursor()
-    query = "SELECT food_id, preference_score FROM user_preferences WHERE user_id = %s"
+    query = "SELECT foodId, preference FROM user_foods WHERE userId = %s"
     cursor.execute(query, (user_id,))
     preferences = cursor.fetchall()
     cursor.close()
     conn.close()
     return {row[0]: row[1] for row in preferences}
-
 
 food_list = get_foods()
 nutrient_list = get_nutrients()
