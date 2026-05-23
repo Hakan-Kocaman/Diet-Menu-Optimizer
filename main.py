@@ -8,7 +8,7 @@ from pymoo.indicators.hv import HV
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.moo.spea2 import SPEA2
 
-from db import foods_list, nutrients_list, get_dri, get_user_preferences
+from db import food_list, nutrient_list, food_nutrient_list, get_dri, get_user_preferences
 from chromosome import decode
 from fitness import fitness
 
@@ -16,15 +16,16 @@ from fitness import fitness
 class DietProblem(Problem):
     def __init__(self, user_id):
         super().__init__(n_var=405, n_obj=3, xl=0, xu=405)
-        self.foods = foods_list
-        self.nutrients = nutrients_list
+        self.foods = food_list
+        self.nutrients = nutrient_list
+        self.food_nutrients = food_nutrient_list
         self.dri = get_dri(user_id)
         self.preferences = get_user_preferences(user_id)
 
     def _evaluate(self, X, out, *args, **kwargs):
         objectives = []
         for x in X:
-            menu, totals = decode(x, self.foods, self.nutrients, self.dri)
+            menu, totals = decode(x, self.foods, self.nutrients, self.food_nutrients, self.dri)
             values, info = fitness(menu, totals, self.foods, self.preferences, self.dri)
             objectives.append(values)
 

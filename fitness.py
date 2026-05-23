@@ -1,5 +1,4 @@
 
-from db import food_list
 
 HUGE_PENALTY = 1_000_000
 
@@ -46,27 +45,26 @@ def calculate_objectives(menu, foods, preferences):
     for food_id in menu:
         food = foods[food_id]
 
-        pref = preferences.get(food_id, food_list.get("preference", 0))
+        pref = preferences.get(food_id, food.get("preference", 0))
 
         if pref == -1:
             forbidden_count += 1
         else:
             preference_score += pref
 
-        total_cost += food_list.get("cost", 0)
-        total_co2 += food_list.get("co2", 0)
-        total_prepTime += food_list.get("preparingTime", 0) or 0
+        total_cost += food.get("cost", 0)
+        total_prepTime += food.get("preparingTime", 0) or 0
 
-        preparing_time = food_list.get("preparingTime", 0) or 0
-        cooking_time = food_list.get("cookingTime", 0) or 0
+        preparing_time = food.get("preparingTime", 0) or 0
+        cooking_time = food.get("cookingTime", 0) or 0
 
         total_time += preparing_time + cooking_time
 
-    return preference_score, total_cost, total_co2, total_time, forbidden_count
+    return preference_score, total_cost, total_time, forbidden_count
 
 
 def validate_objectives(objectives):
-    allowed = {"preference", "cost", "co2", "time"}
+    allowed = {"preference", "cost", "prepTime"}
 
     if len(objectives) != 3:
         raise ValueError("Exactly 3 objectives must be selected.")
@@ -86,11 +84,11 @@ def fitness(
     preferences,
     dri,
     lambda_=1.0,
-    objectives=("preference", "cost", "co2")
+    objectives=("preference", "cost", "prepTime")
 ):
     validate_objectives(objectives)
 
-    preference_score, total_cost, total_co2, total_time, forbidden_count = calculate_objectives(
+    preference_score, total_cost, total_time, forbidden_count = calculate_objectives(
         menu, foods, preferences
     )
 
@@ -111,8 +109,7 @@ def fitness(
     info = {
         "raw_preference": preference_score,
         "cost": total_cost,
-        "co2": total_co2,
-        "time": total_time,
+        "prepTime": total_time,
         "nutrition_penalty": nutrition_penalty,
         "forbidden_count": forbidden_count,
         "forbidden_penalty": forbidden_penalty,
