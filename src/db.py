@@ -58,10 +58,8 @@ def get_food_nutrients():
     return result
 
 def get_dri(user_id):
-    # dri tablosunda user_id yok, yaş ve cinsiyete göre filtreleniyor
     conn = get_connection()
     cursor = conn.cursor()
-    # Önce kullanıcı bilgilerini al
     cursor.execute("SELECT age, gender FROM user WHERE id = %s", (user_id,))
     user = cursor.fetchone()
     if not user:
