@@ -1,7 +1,4 @@
-
-
 HUGE_PENALTY = 1_000_000
-
 
 def calculate_penalty(totals, dri):
     penalty = 0.0
@@ -34,7 +31,6 @@ def calculate_penalty(totals, dri):
 
     return penalty, violation_details
 
-
 def calculate_objectives(menu, foods, preferences):
     preference_score = 0.0
     total_cost = 0.0
@@ -61,9 +57,6 @@ def calculate_objectives(menu, foods, preferences):
         total_time += preparing_time + cooking_time
 
     return preference_score, total_cost, total_time, forbidden_count
-
-
-
 
 def fitness(
     menu,

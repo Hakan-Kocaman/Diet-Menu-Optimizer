@@ -1,6 +1,4 @@
 import os
-
-
 output_dir = os.path.join(os.path.dirname(__file__), '..', 'results')
 os.makedirs(output_dir, exist_ok=True)
 
@@ -28,7 +26,7 @@ from fitness import fitness
 import visualize
 
 
-# ── CALLBACK ────────────────────────────────────────────────────
+# --- Callback to track F history during optimization ---
 class FHistoryCallback(Callback):
     def __init__(self):
         super().__init__()
@@ -42,7 +40,7 @@ class FHistoryCallback(Callback):
             self.F_history.append(None)
 
 
-# ── PROBLEM ─────────────────────────────────────────────────────
+# ---- Problem Definition and Optimization ----
 class DietProblem(ElementwiseProblem):
     def __init__(self, user_id, diversity=True):
         super().__init__(n_var=405, n_obj=3, xl=0, xu=405)
@@ -59,7 +57,7 @@ class DietProblem(ElementwiseProblem):
         out["F"] = values
 
 
-# ── NON-VEGAN - USER 1 ──────────────────────────────────────────
+# -------NON-VEGAN - USER 1 ----------------------------------------------------------------------------------------------------------------------------------------
 problem_u1 = DietProblem(user_id=1)
 
 cb = FHistoryCallback()
@@ -85,37 +83,42 @@ algorithm = NSGA3(ref_dirs=ref_dirs, pop_size=100, sampling=PermutationRandomSam
 result_u1_n3 = minimize(problem_u1, algorithm, ('n_gen', 200), verbose=True, callback=cb)
 u1_n3_history = cb.F_history
 print("NSGA3:", len(result_u1_n3.F), "solution")
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-# ── VEGAN - USER 2 ──────────────────────────────────────────────
+# -------VEGAN - USER 2 ----------------------------------------------------------------------------------------------------------------------------------------
 problem_u2 = DietProblem(user_id=2)
 
+# User 2 NSGA2
 cb = FHistoryCallback()
 algorithm = NSGA2(pop_size=100, sampling=PermutationRandomSampling(), crossover=OrderCrossover(), mutation=InversionMutation(), eliminate_duplicates=True)
 result_u2_n2 = minimize(problem_u2, algorithm, ('n_gen', 200), verbose=True, callback=cb)
 u2_n2_history = cb.F_history
 print("NSGA2:", len(result_u2_n2.F), "solution")
 
+# User 2 SPEA2
 cb = FHistoryCallback()
 algorithm = SPEA2(pop_size=100, sampling=PermutationRandomSampling(), crossover=OrderCrossover(), mutation=InversionMutation(), eliminate_duplicates=True)
 result_u2_s2 = minimize(problem_u2, algorithm, ('n_gen', 200), verbose=True, callback=cb)
 u2_s2_history = cb.F_history
 print("SPEA2:", len(result_u2_s2.F), "solution")
 
+# User 2 SMSEMOA
 cb = FHistoryCallback()
 algorithm = SMSEMOA(pop_size=100, sampling=PermutationRandomSampling(), crossover=OrderCrossover(), mutation=InversionMutation(), eliminate_duplicates=True)
 result_u2_sms = minimize(problem_u2, algorithm, ('n_gen', 200), verbose=True, callback=cb)
 u2_sms_history = cb.F_history
 print("SMSEMOA:", len(result_u2_sms.F), "solution")
 
+# User 2 NSGA3
 cb = FHistoryCallback()
 algorithm = NSGA3(ref_dirs=ref_dirs, pop_size=100, sampling=PermutationRandomSampling(), crossover=OrderCrossover(), mutation=InversionMutation(), eliminate_duplicates=True)
 result_u2_n3 = minimize(problem_u2, algorithm, ('n_gen', 200), verbose=True, callback=cb)
 u2_n3_history = cb.F_history
 print("NSGA3:", len(result_u2_n3.F), "solution")
 
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# ── KARŞILAŞTIRMA - REFERANS NOKTASI & HYPERVOLUME ──────────────
+# --- Compute Hypervolume (Reference point for all 4 algorithms) ---
 all_F = np.vstack([
     result_u1_n2.F, result_u1_s2.F, result_u1_n3.F, result_u1_sms.F,
     result_u2_n2.F, result_u2_s2.F, result_u2_n3.F, result_u2_sms.F,
@@ -138,7 +141,7 @@ for key, val in hv_dict.items():
     print(f"{key} Hypervolume : {val}")
 
 
-# ── SONUÇLARI CSV KAYDET ────────────────────────────────────────
+# --- Save results to CSV ---
 pd.DataFrame(result_u1_n2.F,  columns=["preference", "cost", "prepTime"]).to_csv(os.path.join(output_dir, "nsga-2_u1.csv"),   index=False)
 pd.DataFrame(result_u1_s2.F,  columns=["preference", "cost", "prepTime"]).to_csv(os.path.join(output_dir, "spea-2_u1.csv"),   index=False)
 pd.DataFrame(result_u1_sms.F, columns=["preference", "cost", "prepTime"]).to_csv(os.path.join(output_dir, "smsemoa_u1.csv"),  index=False)
@@ -149,7 +152,7 @@ pd.DataFrame(result_u2_s2.F,  columns=["preference", "cost", "prepTime"]).to_csv
 pd.DataFrame(result_u2_sms.F, columns=["preference", "cost", "prepTime"]).to_csv(os.path.join(output_dir, "smsemoa_u2.csv"),  index=False)
 pd.DataFrame(result_u2_n3.F,  columns=["preference", "cost", "prepTime"]).to_csv(os.path.join(output_dir, "nsga-3_u2.csv"),   index=False)
 
-# ── DIVERSITY KARŞILAŞTIRMASI - USER 1, NSGA2 ───────────────────
+# --- Diversity Comparison (NSGA2 with vs without diversity) ---
 problem_u1_nodiv = DietProblem(user_id=1, diversity=False)
 
 cb = FHistoryCallback()
@@ -157,7 +160,8 @@ algorithm = NSGA2(pop_size=100, sampling=PermutationRandomSampling(), crossover=
 result_u1_n2_nodiv = minimize(problem_u1_nodiv, algorithm, ('n_gen', 200), verbose=True, callback=cb)
 print("NSGA2 (no diversity):", len(result_u1_n2_nodiv.F), "solution")
 
-# ── GÖRSELLEŞTİRME ─────────────────────────────────────────────
+
+# --- Visualization ---
 
 visualize.run_all(
     results_u1=[result_u1_n2, result_u1_s2, result_u1_sms, result_u1_n3],

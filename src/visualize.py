@@ -1,8 +1,3 @@
-"""
-visualize.py  –  Diet Optimization Results Visualizer
-Run after main.py has populated the result_* variables and *_history lists.
-"""
-
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,16 +8,13 @@ os.makedirs(output_dir, exist_ok=True)
 
 ALGO_LABELS  = ["NSGA-2", "SPEA-2", "SMS-EMOA", "NSGA-3"]
 USER_LABELS  = ["User-1 (Non-Vegan)", "User-2 (Vegan)"]
-OBJ_LABELS   = ["Preference ↓", "Cost ↓", "Prep Time ↓"]
-COLORS       = ["#E63946", "#457B9D", "#2A9D8F", "#E9C46A"]
+OBJ_LABELS   = ["Preference", "Cost", "Prep Time"]
+COLORS       = ["red", "blue", "green", "yellow"]
 
 
-# ─── 1. Pareto Front – 3-D scatter ────────────────────────────────────────────
+# --- Pareto Front – 3-D scatter plot ---
 
 def plot_pareto_3d(results_u1, results_u2):
-    """
-    results_u1 / results_u2 : list of 4 result objects [nsga2, spea2, sms, nsga3]
-    """
     fig = plt.figure(figsize=(16, 6))
     fig.suptitle("Pareto Fronts – 3-D Objective Space", fontsize=14, fontweight="bold")
 
@@ -45,16 +37,10 @@ def plot_pareto_3d(results_u1, results_u2):
     print("Saved: pareto_3d.png")
 
 
-# ─── 2. Convergence Curve – HV vs Generation ──────────────────────────────────
+# --- Convergence Curve – HV vs Generation ---
 
 def plot_convergence(histories_u1, histories_u2, ref_point):
-    """
-    histories_u*  : list of 4 F_history lists  (each is a list of length n_gen,
-                    where each element is an (n, 3) array or None)
-    ref_point     : (3,) array used for HV
-    """
     hv_calc = HV(ref_point=ref_point)
-
     fig, axes = plt.subplots(1, 2, figsize=(14, 5), sharey=False)
     fig.suptitle("Convergence – Hypervolume per Generation", fontsize=14, fontweight="bold")
 
@@ -83,7 +69,7 @@ def plot_convergence(histories_u1, histories_u2, ref_point):
     print("Saved: convergence.png")
 
 
-# ─── 3. HV Bar Chart ──────────────────────────────────────────────────────────
+# --- 3. HV Bar Chart ---
 
 def plot_hv_bar(hv_dict):
     """
@@ -95,7 +81,7 @@ def plot_hv_bar(hv_dict):
 
     fig, ax = plt.subplots(figsize=(12, 5))
     bars = ax.bar(labels, values, color=bar_colors, edgecolor="white", linewidth=0.8)
-    ax.set_title("Hypervolume Comparison (higher = better)", fontsize=13, fontweight="bold")
+    ax.set_title("Hypervolume Comparison", fontsize=13, fontweight="bold")
     ax.set_ylabel("Hypervolume")
     ax.set_xticks(range(len(labels)))
     ax.set_xticklabels(labels, rotation=30, ha="right", fontsize=9)
@@ -111,13 +97,9 @@ def plot_hv_bar(hv_dict):
     plt.close()
     print("Saved: hv_bar.png")
 
-# ─── 5. Diversity Karşılaştırması ─────────────────────────────────────────────
+# --- Diversity Karşılaştırması ---
 
 def plot_diversity_comparison(result_with, result_without, decode_fn, foods, nutrients, food_nutrients, dri):
-    """
-    Pareto front overlay + ortalama group sayısı karşılaştırması
-    """
-    # ── Ortalama group sayısını hesapla
     def avg_groups(result):
         counts = []
         for x in result.X:
@@ -136,8 +118,8 @@ def plot_diversity_comparison(result_with, result_without, decode_fn, foods, nut
     ax = axes[0]
     ax.scatter(result_with.F[:, 0],    result_with.F[:, 1],    color=COLORS[0], s=25, alpha=0.8, label="With Diversity")
     ax.scatter(result_without.F[:, 0], result_without.F[:, 1], color=COLORS[1], s=25, alpha=0.8, label="Without Diversity")
-    ax.set_xlabel("Preference ↓")
-    ax.set_ylabel("Cost ↓")
+    ax.set_xlabel("Preference")
+    ax.set_ylabel("Cost")
     ax.set_title("Pareto Front (Preference vs Cost)")
     ax.legend()
     ax.grid(True, alpha=0.3)
@@ -170,10 +152,10 @@ def plot_diversity_comparison(result_with, result_without, decode_fn, foods, nut
     plt.show()
     plt.close()
     print("Saved: diversity_comparison.png")
-# ─── 4. Sample Menu Table ─────────────────────────────────────────────────────
 
-def plot_menu_table(result, decode_fn, foods, nutrients, food_nutrients, dri,
-                    n_samples=3, title="Sample Menus", filename="menu_table.png"):
+# --- 5. Sample Menu Table ---
+
+def plot_menu_table(result, decode_fn, foods, nutrients, food_nutrients, dri, n_samples=3, title="Sample Menus", filename="menu_table.png"):
     NUTRIENT_NAMES = {5: "Energy(kcal)", 15: "Protein(g)", 8: "Carb(g)", 4: "Fiber(g)", 17: "Sodium(mg)"}
     NUT_IDS = [5, 15, 8, 4, 17]
 
@@ -216,7 +198,7 @@ def plot_menu_table(result, decode_fn, foods, nutrients, food_nutrients, dri,
             cell.set_text_props(ha="left", wrap=True)
 
     for col in range(len(col_headers)):
-        tbl[0, col].set_facecolor("#2A9D8F")
+        tbl[0, col].set_facecolor(color="blue")
         tbl[0, col].set_text_props(color="white", fontweight="bold")
 
     ax.set_title(title, fontsize=12, fontweight="bold", pad=12)
@@ -224,9 +206,9 @@ def plot_menu_table(result, decode_fn, foods, nutrients, food_nutrients, dri,
     plt.savefig(os.path.join(output_dir, filename), dpi=150, bbox_inches="tight")
     plt.show()
     plt.close()
-    print(f"Saved: {filename}")
+    print("Saved:" + filename)
 
-# ─── Entry Point (called from main.py or standalone) ──────────────────────────
+# --- run plots ---
 
 def run_all(
     results_u1, results_u2,           # each: [nsga2, spea2, sms, nsga3]
@@ -260,4 +242,5 @@ def run_all(
             food_nutrients=food_nutrients,
             dri=dri_u1,
         )
-    print("\nAll plots saved to: Diet-Menu-Optimizer\results")
+    print("\nAll plots saved to: Diet-Menu-Optimizer \ results")
+
