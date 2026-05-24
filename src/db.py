@@ -24,13 +24,13 @@ test_connection()
 def get_foods():
     conn = get_connection()
     cursor = conn.cursor()
-    query = "SELECT id, name, cost, preparingTime, cookingTime, preference, co2 FROM foods"
+    query = "SELECT id, name, cost, preparingTime, cookingTime, preference, co2, foodGroupId FROM foods"
     cursor.execute(query)
     foods = cursor.fetchall()
     cursor.close()
     conn.close()
     return {row[0]: {"name": row[1], "cost": row[2], "preparingTime": row[3],
-                     "cookingTime": row[4], "preference": row[5], "co2": row[6]} for row in foods}
+                     "cookingTime": row[4], "preference": row[5], "co2": row[6], "foodGroupId": row[7]} for row in foods}
 
 def get_nutrients():
     conn = get_connection()

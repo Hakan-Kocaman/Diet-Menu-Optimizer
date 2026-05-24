@@ -63,18 +63,6 @@ def calculate_objectives(menu, foods, preferences):
     return preference_score, total_cost, total_time, forbidden_count
 
 
-def validate_objectives(objectives):
-    allowed = {"preference", "cost", "prepTime"}
-
-    if len(objectives) != 3:
-        raise ValueError("Exactly 3 objectives must be selected.")
-
-    if "preference" not in objectives:
-        raise ValueError("Preference objective is mandatory.")
-
-    for obj in objectives:
-        if obj not in allowed:
-            raise ValueError(f"Invalid objective: {obj}")
 
 
 def fitness(
@@ -86,7 +74,7 @@ def fitness(
     lambda_=1.0,
     objectives=("preference", "cost", "prepTime")
 ):
-    validate_objectives(objectives)
+
 
     preference_score, total_cost, total_time, forbidden_count = calculate_objectives(
         menu, foods, preferences

@@ -18,7 +18,7 @@ import numpy as np
 #Ogle/Aksam parametreleri
 #ALL_NUTRIENTS = [NUTRIENT_ENERGY, NUTRIENT_PROTEIN,NUTRIENT_CARB, NUTRIENT_FIBER, NUTRIENT_SODIUM]
 
-def decode(x, foods, nutrients, food_nutrients, dri):
+def decode(x, foods, nutrients, food_nutrients, dri, diversity=True, min_groups=8):
 
     
 
@@ -127,7 +127,20 @@ def decode(x, foods, nutrients, food_nutrients, dri):
         total_fiber   += food_fiber
         total_sodium  += food_sodium
 
-    menu=breakfast_menu + lunch_dinner_menu
+    menu = breakfast_menu + lunch_dinner_menu
+
+    if diversity:
+        present_groups = {foods[f]["foodGroupId"] for f in menu if f in foods}
+        if len(present_groups) < min_groups:
+            menu_set = set(menu)
+            for food_id, food in foods.items():
+                if len(present_groups) >= min_groups:
+                    break
+                gid = food["foodGroupId"]
+                if gid not in present_groups and food_id not in menu_set:
+                    menu.append(food_id)
+                    menu_set.add(food_id)
+                    present_groups.add(gid)
     total_nutrients = {
         5: total_energy,
         15: total_protein,
