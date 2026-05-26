@@ -18,24 +18,22 @@ import numpy as np
 #Ogle/Aksam parametreleri
 #ALL_NUTRIENTS = [NUTRIENT_ENERGY, NUTRIENT_PROTEIN,NUTRIENT_CARB, NUTRIENT_FIBER, NUTRIENT_SODIUM]
 
+BREAKFAST_GROUPS    = {1, 4, 5, 7, 11, 12, 13, 14, 17, 20, 26, 27}
+LUNCH_DINNER_GROUPS = {0, 2, 3, 6, 8, 9, 10, 15, 16, 18, 19, 21, 22, 23, 24, 25, 28}
+
 def decode(x, foods, nutrients, food_nutrients, dri, diversity=True, min_groups=8):
+    breakfast_ids    = [fid for fid in foods if foods[fid]["foodGroupId"] in BREAKFAST_GROUPS]
+    lunch_dinner_ids = [fid for fid in foods if foods[fid]["foodGroupId"] in LUNCH_DINNER_GROUPS]
 
+    n_b = len(breakfast_ids)
+    n_l = len(lunch_dinner_ids)
+
+    x_b = x[:n_b]
+    x_l = x[n_b:n_b + n_l]
+
+    breakfast_genes    = [breakfast_ids[i]    for i in np.argsort(x_b)]
+    lunch_dinner_genes = [lunch_dinner_ids[i] for i in np.argsort(x_l)]
     
-
-    food_id_list=list()
-    food_id_list=list(foods.keys())
-
-    #gelen float dizisinin kucukten buyuge siralanmis indeksleri
-    index_sorted_x = np.argsort(x)
-    
-    permutation = []
-    
-    for i in index_sorted_x:
-        food_id=food_id_list[i]
-        permutation.append(food_id)
-
-    breakfast_genes    = permutation[:94]   # ilk 94
-    lunch_dinner_genes = permutation[94:]   # kalan 311
 
     #ust sınır: günlük RUL × 1.15 × 0.35
     energy_upper_bound = {}

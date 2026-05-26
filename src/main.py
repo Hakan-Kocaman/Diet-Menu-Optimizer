@@ -21,9 +21,10 @@ from pymoo.algorithms.moo.sms import SMSEMOA
 from pymoo.algorithms.moo.nsga3 import NSGA3
 
 from db import food_list, nutrient_list, food_nutrient_list, get_dri, get_user_preferences
-from chromosome import decode
+from chromosome import decode, BREAKFAST_GROUPS, LUNCH_DINNER_GROUPS
 from fitness import fitness
 import visualize
+
 
 
 # --- Callback to track F history during optimization ---
@@ -43,7 +44,9 @@ class FHistoryCallback(Callback):
 # ---- Problem Definition and Optimization ----
 class DietProblem(ElementwiseProblem):
     def __init__(self, user_id, diversity=True):
-        super().__init__(n_var=405, n_obj=3, xl=0, xu=405)
+        n_b = sum(1 for f in food_list.values() if f["foodGroupId"] in BREAKFAST_GROUPS)
+        n_l = sum(1 for f in food_list.values() if f["foodGroupId"] in LUNCH_DINNER_GROUPS)
+        super().__init__(n_var=n_b + n_l, n_obj=3, xl=0, xu=n_b + n_l)
         self.foods = food_list
         self.nutrients = nutrient_list
         self.food_nutrients = food_nutrient_list

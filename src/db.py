@@ -86,7 +86,21 @@ def get_user_preferences(user_id):
     preferences = cursor.fetchall()
     cursor.close()
     conn.close()
-    return {row[0]: row[1] for row in preferences}
+
+    if preferences:
+        return {row[0]: row[1] for row in preferences}
+    
+    # user_foods boşsa 
+
+    # user_id=1 -> preference, user_id=2 ->y preference2
+    pref_col = "preference" if user_id == 1 else "preference2"
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT id, {pref_col} FROM foods")
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return {row[0]: row[1] for row in rows}
 
 food_list = get_foods()
 nutrient_list = get_nutrients()

@@ -166,7 +166,7 @@ def plot_menu_table(result, decode_fn, foods, nutrients, food_nutrients, dri, n_
     idx = idx[:n_samples]
 
     rows = []
-    col_headers = ["Sol #", "Pref ↓", "Cost ↓", "Time ↓", "Foods (top-5)", "Nutrients vs DRI"]
+    col_headers = [" ", "Pref", "Cost", "Time", "Foods (top-5)", "Nutrients vs DRI"]
 
     for rank, i in enumerate(idx):
         menu, totals = decode_fn(X[i], foods, nutrients, food_nutrients, dri)
@@ -206,7 +206,7 @@ def plot_menu_table(result, decode_fn, foods, nutrients, food_nutrients, dri, n_
     plt.savefig(os.path.join(output_dir, filename), dpi=150, bbox_inches="tight")
     plt.show()
     plt.close()
-    print("Saved:" + filename)
+    print("Saved: " + filename)
 
 # --- run plots ---
 
@@ -242,5 +242,5 @@ def run_all(
             food_nutrients=food_nutrients,
             dri=dri_u1,
         )
-    print("\nAll plots saved to: Diet-Menu-Optimizer \ results")
+    print("\nAll plots saved to: Diet-Menu-Optimizer/results")
 
