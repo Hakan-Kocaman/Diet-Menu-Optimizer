@@ -19,15 +19,14 @@ Four state-of-the-art Multi-Objective Evolutionary Algorithms (MOEAs) are implem
 
 ## Authors
 
-| Student ID     | Name                  |
-|----------------|-----------------------|
-| 2321021003     | Hakan Kocaman         |
-| 2321021019     | Ahmet Uğurlu          |
-| 2221221048     | Ahmet Mesut Yolcu     |
-| 2121221022     | Muhammed Eren Koçkan  |
-| Ç2025201009    | Hazal Beşire Turhan   |
+| Student ID     | Name                  | Work	           |
+|----------------|-----------------------|-----------------|
+| 2321021003     | Hakan Kocaman         | main.py	       |	
+| 2321021019     | Ahmet Emin Uğurlu     | chromosome.py   |
+| 2221221048     | Ahmet Mesut Yolcu     | fitness.py      |
+| 2121221022     | Muhammed Eren Koçkan  | db.py           |
+| Ç2025201009    | Hazal Beşire Turhan   | visualize.py    |
 
-**Supervisor:** Dr. Öğr. Cumali Türkmen
 
 ---
 
